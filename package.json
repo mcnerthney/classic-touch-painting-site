@@ -1,0 +1,12 @@
+{
+  "name": "classic-touch-painting-site",
+  "version": "1.0.0",
+  "description": "Simple one-page Node.js site for Classic Touch Painting",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

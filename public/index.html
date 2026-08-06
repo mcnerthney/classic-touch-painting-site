@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Classic Touch Painting | Reyman Foster</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="stripe"></div>
+
+  <header class="hero">
+    <div class="container">
+      <p class="tagline">"Attention to Detail"</p>
+      <h1>Classic Touch Painting</h1>
+      <p class="subtitle">Top quality painting at affordable prices!</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Reyman Foster</h2>
+      <p class="role">Owner / Painter</p>
+      <ul class="highlights">
+        <li>Family owned and operated for 25 years!</li>
+        <li>Written contracts!</li>
+        <li>Free estimates!</li>
+      </ul>
+    </section>
+
+    <section class="card contact">
+      <h2>Get In Touch</h2>
+      <p>
+        <span class="label">Cell:</span>
+        <a href="tel:+15413800775">(541) 380-0775</a>
+      </p>
+      <p>
+        <span class="label">Email:</span>
+        <a href="mailto:reymanfoster@aol.com">reymanfoster@aol.com</a>
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="stripe"></div>
+    <p>&copy; <span id="year"></span> Classic Touch Painting. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
