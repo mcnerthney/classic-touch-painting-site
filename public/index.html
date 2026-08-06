@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Classic Touch Painting | Reyman Foster</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
   <div class="stripe"></div>
 
@@ -36,8 +38,50 @@
       </p>
       <p>
         <span class="label">Email:</span>
-        <a href="mailto:reymanfoster@aol.com">reymanfoster@aol.com</a>
+        <a href="mailto:reyman@fosterpaint.com">reyman@fosterpaint.com</a>
       </p>
+    </section>
+
+    <section class="card reviews">
+      <h2>Client Reviews</h2>
+      <div id="reviews-list" aria-live="polite"></div>
+    </section>
+
+    <section class="card contact-form-card">
+      <h2>Contact Me</h2>
+      <p class="form-intro">Tell us about your project and we will get back to you soon.</p>
+      <form id="contact-form" novalidate>
+        <div class="form-grid">
+          <label>
+            Name
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Phone
+            <input type="tel" name="phone" autocomplete="tel" />
+          </label>
+          <label class="full-width">
+            Message
+            <textarea name="message" rows="5" required></textarea>
+          </label>
+        </div>
+
+        <div class="hp-field" aria-hidden="true">
+          <label>
+            Leave this field empty
+            <input type="text" name="honeypot" tabindex="-1" autocomplete="off" />
+          </label>
+        </div>
+
+        <input type="hidden" name="formStartedAt" id="form-started-at" />
+
+        <button type="submit" id="contact-submit">Send Message</button>
+        <p id="form-status" class="form-status" role="status" aria-live="polite"></p>
+      </form>
     </section>
   </main>
 
@@ -48,6 +92,80 @@
 
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById('form-started-at').value = String(Date.now());
+
+    async function handleContactSubmit(event) {
+      event.preventDefault();
+
+      const form = document.getElementById('contact-form');
+      const submitButton = document.getElementById('contact-submit');
+      const status = document.getElementById('form-status');
+      const formData = new FormData(form);
+      const payload = Object.fromEntries(formData.entries());
+
+      status.textContent = 'Sending your message...';
+      status.className = 'form-status pending';
+      submitButton.disabled = true;
+
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Unable to send message.');
+        }
+
+        status.textContent = result.message;
+        status.className = 'form-status success';
+        form.reset();
+        document.getElementById('form-started-at').value = String(Date.now());
+      } catch (error) {
+        status.textContent = error.message || 'Unable to send message. Please try again.';
+        status.className = 'form-status error';
+      } finally {
+        submitButton.disabled = false;
+      }
+    }
+
+    document.getElementById('contact-form').addEventListener('submit', handleContactSubmit);
+
+    async function loadReviews() {
+      const reviewsList = document.getElementById('reviews-list');
+
+      try {
+        const response = await fetch('reviews.json');
+
+        if (!response.ok) {
+          throw new Error('Unable to load reviews.');
+        }
+
+        const reviews = await response.json();
+
+        reviewsList.innerHTML = reviews
+          .map(
+            (review) => `
+              <article class="review-item">
+                <p class="review-comment">"${review.comment}"</p>
+                <p class="review-name">${review.name}</p>
+              </article>
+            `
+          )
+          .join('');
+      } catch (error) {
+        reviewsList.innerHTML =
+          '<p class="review-fallback">Reviews are temporarily unavailable. Please check back soon.</p>';
+      }
+    }
+
+    loadReviews();
   </script>
 </body>
+
 </html>

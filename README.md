@@ -76,3 +76,29 @@ This app serves static files using Express and reads `PORT` from environment var
 
 - `PORT` (optional): server port (default is `3000`)
 
+## Contact Form Email Setup (Fastmail)
+
+The contact form posts to `/api/contact` and sends email via SMTP.
+
+Use a local `.env` file (not committed):
+
+```bash
+cp .env.example .env
+```
+
+Set these values:
+
+- `SMTP_USER`: your full Fastmail email address (username is the email)
+- `SMTP_PASS`: your Fastmail app password
+
+Optional (defaults are already Fastmail-safe in `server.js`):
+
+- `SMTP_HOST=smtp.fastmail.com`
+- `SMTP_PORT=465`
+
+Then start the app:
+
+```bash
+npm start
+```
+
