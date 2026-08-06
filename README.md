@@ -102,3 +102,15 @@ Then start the app:
 npm start
 ```
 
+## Staging Protection
+
+You can protect the whole site (including `/api/contact`) behind a password screen.
+
+Set these environment variables:
+
+- `STAGING_ENABLED=true`
+- `STAGING_PASSWORD=<your staging password>`
+- `STAGING_SESSION_SECRET=<long random secret>`
+
+When enabled, visitors must enter the staging password at `/staging-login` before they can access the site.
+

@@ -1,4 +1,7 @@
+require('dotenv').config();
+
 const express = require('express');
+const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const path = require('path');
 
@@ -9,9 +12,241 @@ const MIN_FORM_FILL_MS = 3000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_PER_IP = 5;
 const requestsByIp = new Map();
+const STAGING_ENABLED = ['1', 'true', 'yes', 'on'].includes(
+  String(process.env.STAGING_ENABLED || '').toLowerCase()
+);
+const STAGING_PASSWORD = process.env.STAGING_PASSWORD || '';
+const STAGING_SESSION_SECRET = process.env.STAGING_SESSION_SECRET || STAGING_PASSWORD;
+const STAGING_COOKIE_NAME = 'ctp_staging_auth';
+const STAGING_COOKIE_MAX_AGE_SECONDS = 12 * 60 * 60;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+function renderStagingLoginPage(errorMessage = '') {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Staging Access | Classic Touch Painting</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Georgia, 'Times New Roman', serif;
+      background: linear-gradient(160deg, #e9dcb8, #f6ebcf);
+      color: #3b2a1a;
+    }
+    .card {
+      width: min(92vw, 420px);
+      background: #fff8e8;
+      border: 1px solid #ddcda0;
+      border-left: 6px solid #6f1f2b;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(59, 42, 26, 0.12);
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.5rem;
+      color: #2f3b2a;
+    }
+    p {
+      margin: 0 0 14px;
+      line-height: 1.45;
+      color: #6b5a45;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddcda0;
+      box-sizing: border-box;
+      margin-top: 6px;
+      font: inherit;
+    }
+    button {
+      margin-top: 14px;
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      background: #2f3b2a;
+      color: #fff8e8;
+      padding: 11px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .error {
+      margin-top: 10px;
+      color: #6f1f2b;
+      font-weight: bold;
+      min-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>Staging Access</h1>
+    <p>This staging site is restricted. Enter the access password.</p>
+    <form method="post" action="/staging-login">
+      <label>
+        Password
+        <input type="password" name="password" required autocomplete="current-password" />
+      </label>
+      <input type="hidden" name="next" value="/" />
+      <button type="submit">Enter Staging</button>
+      <p class="error">${errorMessage}</p>
+    </form>
+  </main>
+</body>
+</html>`;
+}
+
+function parseCookies(cookieHeader = '') {
+  const cookiePairs = cookieHeader.split(';').map((part) => part.trim());
+  const result = {};
+
+  cookiePairs.forEach((pair) => {
+    if (!pair) {
+      return;
+    }
+
+    const separatorIndex = pair.indexOf('=');
+    if (separatorIndex === -1) {
+      return;
+    }
+
+    const key = pair.slice(0, separatorIndex);
+    const value = pair.slice(separatorIndex + 1);
+    result[key] = decodeURIComponent(value);
+  });
+
+  return result;
+}
+
+function getStagingToken() {
+  if (!STAGING_PASSWORD || !STAGING_SESSION_SECRET) {
+    return '';
+  }
+
+  return crypto
+    .createHash('sha256')
+    .update(`${STAGING_PASSWORD}:${STAGING_SESSION_SECRET}`)
+    .digest('hex');
+}
+
+function safeEqualText(a, b) {
+  const first = Buffer.from(String(a));
+  const second = Buffer.from(String(b));
+
+  if (first.length !== second.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(first, second);
+}
+
+function isStagingAuthenticated(req) {
+  const expectedToken = getStagingToken();
+  if (!expectedToken) {
+    return false;
+  }
+
+  const cookies = parseCookies(req.headers.cookie || '');
+  return safeEqualText(cookies[STAGING_COOKIE_NAME] || '', expectedToken);
+}
+
+function isSafeRedirectPath(nextPath) {
+  return typeof nextPath === 'string' && nextPath.startsWith('/') && !nextPath.startsWith('//');
+}
+
+app.get('/staging-login', (req, res) => {
+  if (!STAGING_ENABLED) {
+    return res.redirect('/');
+  }
+
+  if (isStagingAuthenticated(req)) {
+    const nextPath = isSafeRedirectPath(req.query.next) ? req.query.next : '/';
+    return res.redirect(nextPath);
+  }
+
+  return res.status(200).send(renderStagingLoginPage(''));
+});
+
+app.post('/staging-login', (req, res) => {
+  if (!STAGING_ENABLED) {
+    return res.redirect('/');
+  }
+
+  if (!STAGING_PASSWORD) {
+    return res.status(503).send(renderStagingLoginPage('Staging is misconfigured: password is missing.'));
+  }
+
+  const submittedPassword = String(req.body.password || '');
+  const nextPath = isSafeRedirectPath(req.body.next) ? req.body.next : '/';
+
+  if (!safeEqualText(submittedPassword, STAGING_PASSWORD)) {
+    return res.status(401).send(renderStagingLoginPage('Incorrect password.'));
+  }
+
+  const authToken = getStagingToken();
+  const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https';
+  const secureAttribute = isSecure ? '; Secure' : '';
+
+  res.setHeader(
+    'Set-Cookie',
+    `${STAGING_COOKIE_NAME}=${encodeURIComponent(authToken)}; Path=/; Max-Age=${STAGING_COOKIE_MAX_AGE_SECONDS}; HttpOnly; SameSite=Lax${secureAttribute}`
+  );
+
+  return res.redirect(nextPath);
+});
+
+app.post('/staging-logout', (req, res) => {
+  res.setHeader(
+    'Set-Cookie',
+    `${STAGING_COOKIE_NAME}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`
+  );
+  return res.redirect('/staging-login');
+});
+
+app.use((req, res, next) => {
+  if (!STAGING_ENABLED) {
+    return next();
+  }
+
+  if (!STAGING_PASSWORD) {
+    return res
+      .status(503)
+      .send(renderStagingLoginPage('Staging is misconfigured: set STAGING_PASSWORD.'));
+  }
+
+  if (
+    req.path === '/staging-login' ||
+    req.path === '/staging-logout' ||
+    req.path === '/favicon.ico'
+  ) {
+    return next();
+  }
+
+  if (isStagingAuthenticated(req)) {
+    return next();
+  }
+
+  if (req.path.startsWith('/api/')) {
+    return res.status(401).json({ ok: false, message: 'Staging authentication required.' });
+  }
+
+  const nextPath = encodeURIComponent(req.originalUrl || '/');
+  return res.redirect(`/staging-login?next=${nextPath}`);
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
