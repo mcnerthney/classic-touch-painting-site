@@ -6,7 +6,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
-      STAGING_ENABLED: ${STAGING_ENABLED:-false}
+      STAGING_ENABLED: ${STAGING_ENABLED:-true}
       STAGING_PASSWORD: ${STAGING_PASSWORD:-}
       STAGING_SESSION_SECRET: ${STAGING_SESSION_SECRET:-}
       SMTP_HOST: ${SMTP_HOST:-smtp.fastmail.com}
