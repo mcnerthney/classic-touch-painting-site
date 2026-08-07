@@ -1,17 +1,14 @@
+```yaml
 # Cloud Build pipeline for building and deploying to Cloud Run.
-#
-# Usage (example):
-# gcloud builds submit --config cloudbuild.yml \
-#   --substitutions=_SERVICE_NAME=classic-touch-painting-site,_REGION=us-central1,_REPOSITORY=cloud-run-images
 
 substitutions:
   _SERVICE_NAME: classic-touch-painting-site
   _REGION: us-west1
   _REPOSITORY: classic-touch-painting-site
-  _SMTP_PASS: ""
   _SMTP_USER: ""
+  _SMTP_PASSWORD: ""
   _STAGING_ENABLED: "true"
-  _STAGING_PASSWORD: "reymon"
+  _STAGING_PASSWORD: ""
   _STAGING_SESSION_SECRET: ""
 
 steps:
@@ -43,7 +40,7 @@ steps:
       - --platform
       - managed
       - --set-env-vars
-      - SMTP_USER=${_SMTP_USER},SMTP_PASSWORD=${_SMTP_PASSWORD},STAGING_ENABLED=true,STAGING_PASSWORD=${_STAGING_PASSWORD},STAGING_SESSION_SECRET=${_STAGING_SESSION_SECRET}
+      - SMTP_USER=${_SMTP_USER},SMTP_PASSWORD=${_SMTP_PASSWORD},STAGING_ENABLED=${_STAGING_ENABLED},STAGING_PASSWORD=${_STAGING_PASSWORD},STAGING_SESSION_SECRET=${_STAGING_SESSION_SECRET}
       - --allow-unauthenticated
 
 images:
@@ -51,3 +48,4 @@ images:
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
