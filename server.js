@@ -289,10 +289,10 @@ function createTransporter() {
     SMTP_HOST = 'smtp.fastmail.com',
     SMTP_PORT = '465',
     SMTP_USER,
-    SMTP_PASS
+    SMTP_PASSWORD
   } = process.env;
 
-  if (!SMTP_USER || !SMTP_PASS) {
+  if (!SMTP_USER || !SMTP_PASSWORD) {
     return null;
   }
 
@@ -307,7 +307,7 @@ function createTransporter() {
     secure: portNumber === 465,
     auth: {
       user: SMTP_USER,
-      pass: SMTP_PASS
+      pass: SMTP_PASSWORD
     }
   });
 }

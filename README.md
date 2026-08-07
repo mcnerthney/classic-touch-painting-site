@@ -105,7 +105,7 @@ cp .env.example .env
 Set these values:
 
 - `SMTP_USER`: your full Fastmail email address (username is the email)
-- `SMTP_PASS`: your Fastmail app password
+- `SMTP_PASSWORD`: your Fastmail app password
 
 Optional (defaults are already Fastmail-safe in `server.js`):
 
