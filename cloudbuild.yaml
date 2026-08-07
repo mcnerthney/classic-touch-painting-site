@@ -7,6 +7,12 @@
 substitutions:
   _SERVICE_NAME: classic-touch-painting-site
   _REGION: us-west1
+  _REPOSITORY: classic-touch-painting-site
+  _SMTP_PASS: ""
+  _SMTP_USER: ""
+  _STAGING_ENABLED: "true"
+  _STAGING_PASSWORD: "reymon"
+  _STAGING_SESSION_SECRET: ""
 
 steps:
   - name: gcr.io/cloud-builders/docker
