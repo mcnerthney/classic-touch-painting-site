@@ -1,4 +1,4 @@
-```yaml
+
 # Cloud Build pipeline for building and deploying to Cloud Run.
 
 substitutions:
