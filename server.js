@@ -380,6 +380,24 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Classic Touch Painting site running at http://localhost:${PORT}`);
-});
+const requestedPort = Number.parseInt(process.env.PORT || '3000', 10);
+const portToUse = Number.isFinite(requestedPort) && requestedPort > 0 ? requestedPort : 3000;
+
+function startServer(port) {
+  const server = app.listen(port, () => {
+    console.log(`Classic Touch Painting site running at http://localhost:${port}`);
+  });
+
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} is busy. Trying ${nextPort} instead.`);
+      startServer(nextPort);
+      return;
+    }
+
+    throw error;
+  });
+}
+
+startServer(portToUse);
