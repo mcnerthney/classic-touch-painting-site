@@ -1,0 +1,15 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: ${PORT:-3000}
+      STAGING_ENABLED: ${STAGING_ENABLED:-false}
+      STAGING_PASSWORD: ${STAGING_PASSWORD:-}
+      STAGING_SESSION_SECRET: ${STAGING_SESSION_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST:-smtp.fastmail.com}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}

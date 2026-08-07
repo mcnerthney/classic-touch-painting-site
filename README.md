@@ -76,6 +76,22 @@ This app serves static files using Express and reads `PORT` from environment var
 
 - `PORT` (optional): server port (default is `3000`)
 
+## Docker
+
+You can run the site in a container with Docker Compose.
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Build and start the container:
+   ```bash
+   docker compose up --build
+   ```
+3. Open http://localhost:3000
+
+The container will use the values from `.env` for SMTP and staging settings.
+
 ## Contact Form Email Setup (Fastmail)
 
 The contact form posts to `/api/contact` and sends email via SMTP.
