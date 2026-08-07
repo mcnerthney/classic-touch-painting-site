@@ -46,4 +46,6 @@ jobs:
             --image "$IMAGE_NAME:${GITHUB_SHA::12}" \
             --region "$REGION" \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars "SMTP_USER=$_SMTP_USER,SMTP_PASS=$_SMTP_PASS,STAGING_ENABLED=$_STAGING_ENABLED,STAGING_PASSWORD=$_STAGING_PASSWORD,STAGING_SESSION_SECRET=$_STAGING_SESSION_SECRET"
+
