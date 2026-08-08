@@ -301,7 +301,7 @@ function createTransporter() {
   // return null;
   //}
   return nodemailer.createTransport({
-    host: '://fastmail.com',
+    host: 'smtp.fastmail.com',
     port: 587,
     secure: false, // Must be false for port 587; upgrading via STARTTLS is handled automatically
     auth: {
