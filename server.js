@@ -300,17 +300,20 @@ function createTransporter() {
   if (!Number.isFinite(portNumber) || portNumber <= 0) {
     return null;
   }
-
   return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: portNumber,
-    secure: portNumber === 465,
+    host: '://fastmail.com',
+    port: 587,
+    secure: false, // Must be false for port 587; upgrading via STARTTLS is handled automatically
     auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASSWORD
+      user: process.env.SMTP_USER,     // Your full Fastmail address
+      pass: process.env.SMTP_PASSWORD, // Your Fastmail App Password
+    },
+    tls: {
+      rejectUnauthorized: true         // Mandates valid SSL certificates
     }
   });
 }
+
 
 app.post('/api/contact', async (req, res) => {
   const { name, email, phone, message, honeypot, formStartedAt } = req.body;
