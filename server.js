@@ -308,9 +308,7 @@ function createTransporter() {
       user: process.env.SMTP_USER,     // Your full Fastmail address
       pass: process.env.SMTP_PASSWORD, // Your Fastmail App Password
     },
-    tls: {
-      rejectUnauthorized: true         // Mandates valid SSL certificates
-    }
+    requireTLS: true
   });
 }
 
