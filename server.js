@@ -347,14 +347,6 @@ app.post('/api/contact', async (req, res) => {
   }
 
   const transporter = createTransporter();
-  await transporter.verify().catch((err) => {
-    return res.status(503).json({
-      ok: false,
-      message: err.message || 'Email service is not configured properly.'
-    })
-  });
-
-
 
   const safeName = String(name).trim();
   const safeEmail = String(email).trim();
