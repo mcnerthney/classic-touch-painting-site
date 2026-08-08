@@ -296,10 +296,10 @@ function createTransporter() {
     return null;
   }
 
-  const portNumber = Number(SMTP_PORT);
-  if (!Number.isFinite(portNumber) || portNumber <= 0) {
-    return null;
-  }
+  //const portNumber = Number(SMTP_PORT);
+  //if (!Number.isFinite(portNumber) || portNumber <= 0) {
+  // return null;
+  //}
   return nodemailer.createTransport({
     host: '://fastmail.com',
     port: 587,
