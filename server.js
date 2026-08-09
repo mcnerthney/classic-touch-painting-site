@@ -2,15 +2,19 @@ require('dotenv').config();
 
 const express = require('express');
 const crypto = require('crypto');
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const PUBLIC_DIR = path.join(__dirname, 'public');
+const INDEX_HTML_PATH = path.join(PUBLIC_DIR, 'index.html');
 const RECIPIENT_EMAIL = 'reyman@fosterpaint.com';
 const MIN_FORM_FILL_MS = 3000;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_MAX_PER_IP = 5;
+const GOOGLE_ANALYTICS_ID = String(process.env.GOOGLE_ANALYTICS_ID || '').trim();
 const requestsByIp = new Map();
 const STAGING_ENABLED = ['1', 'true', 'yes', 'on'].includes(
   String(process.env.STAGING_ENABLED || '').toLowerCase()
@@ -168,6 +172,31 @@ function isSafeRedirectPath(nextPath) {
   return typeof nextPath === 'string' && nextPath.startsWith('/') && !nextPath.startsWith('//');
 }
 
+function getGoogleAnalyticsSnippet() {
+  if (!GOOGLE_ANALYTICS_ID) {
+    return '';
+  }
+
+  return `  <script async src="https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ANALYTICS_ID}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', '${GOOGLE_ANALYTICS_ID}');
+  </script>`;
+}
+
+function renderIndexHtml() {
+  const template = fs.readFileSync(INDEX_HTML_PATH, 'utf8');
+  const googleAnalyticsSnippet = getGoogleAnalyticsSnippet();
+
+  if (!googleAnalyticsSnippet) {
+    return template;
+  }
+
+  return template.replace('</head>', `${googleAnalyticsSnippet}\n</head>`);
+}
+
 app.get('/staging-login', (req, res) => {
   if (!STAGING_ENABLED) {
     return res.redirect('/');
@@ -248,7 +277,12 @@ app.use((req, res, next) => {
   return res.redirect(`/staging-login?next=${nextPath}`);
 });
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.get(['/', '/index.html'], (req, res) => {
+  res.type('html');
+  return res.send(renderIndexHtml());
+});
+
+app.use(express.static(PUBLIC_DIR, { index: false }));
 
 function isLikelySpam({ honeypot, formStartedAt, message, name }) {
   if (honeypot && honeypot.trim() !== '') {

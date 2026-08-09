@@ -75,6 +75,7 @@ This app serves static files using Express and reads `PORT` from environment var
 ## Environment Variables
 
 - `PORT` (optional): server port (default is `3000`)
+- `GOOGLE_ANALYTICS_ID` (optional): Google Analytics 4 measurement ID, for example `G-XXXXXXXXXX`
 
 ## Docker
 
@@ -117,6 +118,16 @@ Then start the app:
 ```bash
 npm start
 ```
+
+## Google Analytics
+
+To enable Google Analytics 4, set your measurement ID in `.env` or your deployment environment:
+
+```bash
+GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+```
+
+When this variable is present, the site injects the standard Google tag into the homepage automatically. Leave it blank to disable analytics.
 
 ## Staging Protection
 
