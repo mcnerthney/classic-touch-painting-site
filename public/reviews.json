@@ -1,6 +1,16 @@
 [
-    {
-        "name": "Louise McCulloch, CRS, GRI - Oregon Broker, Don Nunamaker REALTORS",
-        "comment": "Reyman has painted plenty of homes for clients, friends and neighbors; he's painted the interior and exterior of my home as well. What I like best about Reyman is his eye for color; his cleanliness and organizational skills regarding the whole of the job from start to finish; and his knowledge of the best paints and materials."
-    }
+  {
+    "name": "Louise McCulloch, CRS, GRI - Oregon Broker, Don Nunamaker REALTORS",
+    "comment": "Reyman has painted plenty of homes for clients, friends and neighbors; he's painted the interior and exterior of my home as well. What I like best about Reyman is his eye for color; his cleanliness and organizational skills regarding the whole of the job from start to finish; and his knowledge of the best paints and materials."
+  },
+  {
+    "name": "Jim Allender - Nextdoor",
+    "source": "Nextdoor",
+    "neighborhood": "Parkdale North - Hwy 35",
+    "date": "28 May 24",
+    "comment": "Reyman Foster with Classic Touch Painting and Repair did a great job on repairing the drywall on our ceiling. He explained his approach before starting, replaced drywall, taped and mudded the area. He did a perfect job of matching the texture. Best of all he cleaned up everything to perfection.",
+    "url": "https://nextdoor.com/p/y8BGzjxmb6_s?view=detail&referrer=nextdoor",
+    "profile_url": "https://nextdoor.com/profile/01pmSJ6Bk3BQ8L3Qd/?is=feed_author",
+    "neighborhood_url": "https://nextdoor.com/neighborhood/parkdalenorthhwy35--mount-hood-parkdale--or/?source=neighborhood_name"
+  }
 ]
