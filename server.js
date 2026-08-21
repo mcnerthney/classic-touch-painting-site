@@ -282,6 +282,11 @@ app.get(['/', '/index.html'], (req, res) => {
   return res.send(renderIndexHtml());
 });
 
+app.get('/painting', (req, res) => {
+  res.type('html');
+  return res.sendFile(path.join(PUBLIC_DIR, 'painting.html'));
+});
+
 app.use(express.static(PUBLIC_DIR, { index: false }));
 
 function isLikelySpam({ honeypot, formStartedAt, message, name }) {
