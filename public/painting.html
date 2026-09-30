@@ -59,6 +59,23 @@
             </section>
         </div>
 
+        <section class="card project-showcase" aria-labelledby="project-showcase-title">
+            <h2 id="project-showcase-title">House Exterior: Before &amp; After</h2>
+            <div class="comparison" id="comparison" style="--split: 50%">
+                <img src="images/house-before.jpg" alt="House exterior before painting" />
+                <img class="comparison-after" src="images/house-after.jpg" alt="House exterior after painting" />
+                <div class="comparison-divider" aria-hidden="true"></div>
+                <div class="comparison-handle" aria-hidden="true"><span>‹ ›</span></div>
+                <span class="comparison-label comparison-before-label" aria-hidden="true">Before</span>
+                <span class="comparison-label comparison-after-label" aria-hidden="true">After</span>
+                <input id="comparison-slider" type="range" min="0" max="100" value="50"
+                    aria-label="Before and after house painting comparison" />
+            </div>
+            <div class="comparison-controls">
+                <button type="button" id="comparison-reset">Reset comparison</button>
+            </div>
+        </section>
+
         <section class="card areas">
             <h2>Areas We Serve</h2>
             <div class="areas-grid" aria-label="Service areas">
@@ -100,6 +117,20 @@
 
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
+
+        const comparison = document.getElementById('comparison');
+        const comparisonSlider = document.getElementById('comparison-slider');
+        const comparisonReset = document.getElementById('comparison-reset');
+
+        function updateComparison() {
+            comparison.style.setProperty('--split', `${comparisonSlider.value}%`);
+        }
+
+        comparisonSlider.addEventListener('input', updateComparison);
+        comparisonReset.addEventListener('click', () => {
+            comparisonSlider.value = 50;
+            updateComparison();
+        });
     </script>
 </body>
 
