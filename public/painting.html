@@ -71,9 +71,6 @@
                 <input id="comparison-slider" type="range" min="0" max="100" value="50"
                     aria-label="Before and after house painting comparison" />
             </div>
-            <div class="comparison-controls">
-                <button type="button" id="comparison-reset">Reset comparison</button>
-            </div>
         </section>
 
         <section class="card areas">
@@ -120,17 +117,18 @@
 
         const comparison = document.getElementById('comparison');
         const comparisonSlider = document.getElementById('comparison-slider');
-        const comparisonReset = document.getElementById('comparison-reset');
+        const beforeLabel = document.querySelector('.comparison-before-label');
+        const afterLabel = document.querySelector('.comparison-after-label');
 
         function updateComparison() {
-            comparison.style.setProperty('--split', `${comparisonSlider.value}%`);
+            const split = Number(comparisonSlider.value);
+            comparison.style.setProperty('--split', `${split}%`);
+            beforeLabel.hidden = split === 0;
+            afterLabel.hidden = split === 100;
         }
 
         comparisonSlider.addEventListener('input', updateComparison);
-        comparisonReset.addEventListener('click', () => {
-            comparisonSlider.value = 50;
-            updateComparison();
-        });
+        updateComparison();
     </script>
 </body>
 
